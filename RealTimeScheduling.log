@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.5.23)  23 MAY 2024 14:07
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.5.23)  23 MAY 2024 15:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**./conference_101719.tex
-(conference_101719.tex
+**./RealTimeScheduling.tex
+(RealTimeScheduling.tex
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
 (IEEEtran.cls
@@ -262,8 +262,8 @@ tex.def
 File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count284
 \l__pdf_internal_box=\box55
-) (conference_101719.aux)
-\openout1 = `conference_101719.aux'.
+) (RealTimeScheduling.aux)
+\openout1 = `RealTimeScheduling.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 12.
 LaTeX Font Info:    ... okay on input line 12.
@@ -344,7 +344,7 @@ Overfull \hbox (52.73775pt too wide) in paragraph at lines 151--152
  [][] 
  []
 
-(conference_101719.bbl)
+(RealTimeScheduling.bbl)
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -356,7 +356,7 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[3 <./high priority ss.png>] (conference_101719.aux)
+[3 <./high priority ss.png>] (RealTimeScheduling.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
@@ -364,12 +364,12 @@ L3 programming layer <2024-01-04>
  ) 
 Here is how much of TeX's memory you used:
  4218 strings out of 474486
- 67163 string characters out of 5743755
+ 67323 string characters out of 5743755
  1946542 words of memory out of 5000000
  26467 multiletter control sequences out of 15000+600000
  596202 words of font info for 108 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 57i,11n,65p,1400b,266s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 57i,11n,65p,1401b,266s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/andre/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmex10.pfb><C:/Users/andre/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/cm/cmmi10.pfb><C:/Users/andre/AppData/Local/Programs/MiKTeX/fonts/type1/p
@@ -384,7 +384,7 @@ Users/andre/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/
 Users/andre/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:
 /Users/andre/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:
 /Users/andre/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on conference_101719.pdf (3 pages, 208587 bytes).
+Output written on RealTimeScheduling.pdf (3 pages, 208754 bytes).
 PDF statistics:
  85 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
