@@ -6,10 +6,34 @@
 \usepackage{algorithmic}
 \usepackage{graphicx}
 \usepackage{textcomp}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=C++,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
 \usepackage{xcolor}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
+
 \title{Sporadic server scheduling in Real-Time operating systems\\
 }
 
@@ -23,11 +47,11 @@ Hamm, Germany \\
 \maketitle
 
 \begin{abstract}
-
+Real Time Operating Systems are time bounded operating systems that rely on executing their tasks within a pre-specified period of time. Periodic tasks are predictable and so their schedulability is relatively simple, however aperiodic tasks make the scheduling process much more complex. As a result of this complexity many scheduling algorithms have been introduced. In this paper we will take a look at one of them, namely Sporadic Server. A full analysis of the history and background of it, Scheduling analysis and an example implementation in C++ is also introduced. 
 \end{abstract}
 
 \begin{IEEEkeywords}
-component, formatting, style, styling, insert
+RTOS, Scheduling, Sporadic Server
 \end{IEEEkeywords}
 
 \section{Introduction}
@@ -99,7 +123,7 @@ Using this equation it is seen that Equation \ref{aRm} is indeed less than Equat
 The LCM of the periods (20,5,10) is calculated which is 20 which would be the scheduling time. Then the priority is set, as mentioned before it's inversely proportional to the period so this means the priorities are set as \(P_2 > P_3 > P_1\)
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.3]{RM overview.png}
+    \includegraphics[scale=0.4]{RM overview.png}
     \caption{Tasks with their period and execution time denoted}
     \label{fig:RMoverview}
 \end{figure}
@@ -108,10 +132,11 @@ The Fig. \ref{fig:RMoverview} shows how the period and the execution time relate
 The algorithm starts then by running the task with the task with the highest priority (i.e. $P_2$) and executes it for 2 units of time uninterrupted. Then $P_3$ is executed for another 2 units of time uninterrupted. After that it's $P_1$'s turn to run but it can only run for 1 unit until it gets preempted and $P_2$ is executed again for another 2 units as it's period has restarted. Since $P_3$'s period has not restarted yet and it was completely executed the algorithm re-executes $P_1$ as it has 2 units of time remaining. Now, all tasks are completely run so nothing is going to be executed until $T=10$. Then the period of $P_2$ and $P_3$ restarts so $P_2$ will run first until $T=12$ and then $P_3$ will run until $T=14$. After that, again all tasks are executed in full so the algorithm doesn't run anything until $T=15$ after which the period of $P_2$ is restarted and it runs until $T=17$ and then stays without running anything until $T=20$. At this point the whole period of 20 units is passed and the pattern repeats. This process could visualised in Fig. \ref{fig:rmTimetable}
 \begin{figure}
     \centering
-    \includegraphics[scale=0.1]{rmtimetable.png}
+    \includegraphics[scale=0.3]{rmtimetable.png}
     \caption{Period of execution using RM algorithm}
     \label{fig:rmTimetable}
 \end{figure}
+\section{Sporadic Server}
 \subsection{Server mechanism}
 The sporadic server was introduced by Sprunt, Sha and Lehoczky from Carnegie Mellon University in 1989. The SS algorithm tries to handle aperiodic tasks by creating a high priority task that serves the  incoming aperiodic task. This server would have a capacity ${C_s}$ that is used up whenever an aperiodic task is executed. This capacity is only replenished after a it has been consumed by a period of time $T_s$. The working of SS algorithm contains also some terminologies\cite{SpruntoSS} that could be explained as follows:
 \begin{itemize}
@@ -148,13 +173,170 @@ Since, however the SS is only executed when there's an aperiodic task, the sched
 \end{table}
 \begin{figure}[h]
     \centering
-    \includegraphics{high priority ss.png}
-    \caption{SS with high priority example.}
+    \includegraphics[scale=0.3]{high priority ss.png}
+    \caption{SS with high priority example}
     \label{fig:high priority ss graph}
 \end{figure}
 \subsection{Schedulability}
-Even though the sporadic server algorithm relies on the RM algorithm, it violates one of the basic assumptions laid out by Liu and Layland in their analysis of RM\cite{schedulingformula} which states "
-\subsection{Implementation in C/C++}
+Even though the sporadic server algorithm relies on the RM algorithm, it violates\cite{Buttazzo.2011} one of the basic assumptions laid out by Liu and Layland in their analysis of RM which states "If a periodic task which has the highest priority is ready for execution, it must execute". In SS however the execution of the periodic task can be deferred in favor of the aperiodic request served by the SS. To prove that this deferral process doesn't affect the schedulability of the system a theorem  was introduced by Sprunt, Sha and Lehoczky\cite{SpruntoSS}. The theory claims "A periodic task set that is schedulable with a task $T_i$
+is also schedulable if $T_i$ is replaced by a Sporadic Server with the same period and execution time."
+To prove this theory an SS is assumed with capacity $C_s$ and period $T_s$. The SS become active at $T_A$ and switches to \textit{idle} at $T_I$. The behaviour of the SS could be categorised into three scenarios:
+\begin{enumerate}
+    \item \textbf{No capacity is consumed} this happens if no aperiodic request arrives and this means the capacity stays at $C_s$ and is ready to execute during the period [$T_A,T_I+T_s$]. In this case the SS is equivalent to a periodic task with execution time $C_s$ and period $T_s$ whose arrival time is delayed from $T_A$ to $T_I$. Since delaying the arrival time of a periodic task doesn't affect schedulability, it follows that an SS with such a behaviour shouldn't either.
+    \item \textbf{$C_s$ is completely consumed during [$T_A,T_I$]} The SS replenished happens after $T_A+T_s$ with the full $C_s$ amount. In this case the SS is identical to a periodic task with execution time $C_s$ and period $T_s$.
+    \item \textbf{$C_s$ is partially consumed} Assume the an amount $C_x$ is consumed. This means that $C_y=C_s-C_x$ are remaining to be used up in the period [$T_I,T_I+T_s$] while $C_x$ will be replenished at $T_A+T_s$. This is equivalent to two process $T_x$ that is released at $T_A$ and $T_y$ where it's release is delayed to $T_I$, and as discussed in case 1 this doesn't affect schedulability.
+\end{enumerate}
+as derived by Buttazzo \cite{Buttazzo.2011} a set of periodic tasks with utilization factor $U_p$ scheduled alongside an SS with utilization factor $U_s$ is schedulable with RM if:
+\begin{equation}
+    U_p \leq n[(\frac{2}{U_s+1})^{\frac{1}{n}}-1]
+\end{equation}
+for larger $n$, it is schedulable if:
+\begin{equation}
+    U_p \leq \ln{\frac{2}{U_s+1}}
+\end{equation}
+\subsection{Implementation in C++}
+We can simulate the operation of the SS algorithm with C++ code. the code starts with some class definitions. Here two classes are defined, Task and \textit{SporadicServer}. The task class follows the logic explained before, however there's also an arrival time attribute which in this implementation would be defined as 0 for all periodic tasks and non-zero for aperiodic ones depending on their arrival time.
+The \textit{SporadicServer} class also follows the logic explained before however since it's important to know when we switch from \textit{active} to \textit{idle} and vise versa, both the last and second to last states are saved in order to compare and know if we switched cases
+\begin{lstlisting}[language=C++]
+class Task {
+public:
+    int id;
+    // Time required to complete the task
+    int execution_time; 
+    // Period of the task
+    int period;    
+    // Next deadline of the task
+    int next_deadline; 
+    // Remaining time to complete the current 
+    //instance of the task
+    int remaining_time; 
+    int arrival_time;
+    bool isPeriodic;
+    // constructor function
+    Task(int id, int exec_time, int period,int arrival_time,bool isPeriodic)
+        : id(id), execution_time(exec_time), period(period),
+          next_deadline(period), remaining_time(exec_time),
+          arrival_time(arrival_time),
+          isPeriodic(isPeriodic) {}
+    // resetting function once period repeates 
+    void reset() {
+        if (isPeriodic){
+        remaining_time = execution_time;
+        next_deadline += period;
+        }}};
+class SporadicServer{
+    public:
+    int capacity;
+    int period;
+    int replenishmentAmount;
+    int replenishmentTime;
+    // to check transistion between Idle to Active
+    bool lastStateActive; 
+    bool secondLastStateActive;
+
+    //Consutructor function
+    SporadicServer(int capacity,int period)
+    :capacity(capacity),period(period),
+    replenishmentAmount(0)
+    ,replenishmentTime(period)
+    ,lastStateActive(false)
+    ,secondLastStateActive(false){}
+};
+\end{lstlisting}
+After the classes are defined a function for scheduling the tasks is defined. First Thing this function is doing is selecting the finding the task to be executed. It does this by getting the task with the lowest priority and non-zero remaining time. If a valid task is found it is sent to the \textit{$execute\_task$} function otherwise we assume the queue is idle. In this case the time is incremented, SS set to inactive and the last state is checked. If the state switched from active to inactive the $RA$ is calculated
+\begin{lstlisting}[language=C++]
+void schedule_tasks(std::vector<Task>& tasks_full, int total_time,std::vector<Task>& tasks,SporadicServer& server) {
+        //sorting tasks for lowest period with non-zero remaining time
+        auto selected_task = std::min_element(tasks.begin(), tasks.end(),comparater);
+        if (selected_task != tasks.end() && selected_task->remaining_time > 0) {
+            execute_task(*selected_task, current_time,server);}
+        // No valid task is selected, Queue is Idle
+        else {
+            current_time++;
+            std::cout<<"Idle at time = "<<current_time<<std::endl;
+            server.secondLastStateActive=
+            server.lastStateActive;
+            server.lastStateActive=false;
+            // Setting RA for SS
+            if (server.secondLastStateActive
+            &&!server.lastStateActive){
+                server.replenishmentAmount= 1-server.capacity;
+        }
+\end{lstlisting}
+The $schedule\_tasks$ function also checks if the replenishment time arrives and replenishes SS with the required $RA$. It also uses the $next\_deadline$ attribute to reset the period and check if any tasks missed their deadlines.
+\begin{lstlisting}[language=C++]
+        // Repleneshing SS if time is equal to RT
+        if(current_time==server.replenishmentTime && server.replenishmentAmount){
+            server.capacity += server.replenishmentAmount;
+            std::cout << "server replinshed with " << server.replenishmentAmount << " at time " << current_time << "\n";
+            server.replenishmentAmount=0;
+        }
+        // Resetting tasks and notifying about missed deadlines if one happens
+        for (auto& task : tasks) {
+            if (current_time >= task.next_deadline) {
+                if (task.remaining_time > 0) {
+                    std::cout << "Task " << task.id << " missed its deadline at time " << current_time << "\n";
+                }
+                task.reset();
+            }
+        }
+\end{lstlisting}
+The \textit{$execute\_task$} checks first if the task to be executed is periodic. If so, the task's  \textit{$remaining\_time$} is simple decremented and the current time incremented. Similar to what happened in the idle queue case, the state of the SS is set to $Idle$ and a check for $RA$ is made.
+
+If the task is aperiodic however, both the \textit{$remaining\_time$} and the $capacity$ for SS are decremented while incrementing the current time. In contrast to previous step the SS is set to $active$ and if the SS was $idle$ before the $RT$ is calculated.
+\begin{lstlisting}[language=C++]
+void execute_task(Task& task, int& current_time,SporadicServer& server) {
+    if(task.isPeriodic){
+    task.remaining_time--;
+    current_time++;
+    server.secondLastStateActive
+    =server.lastStateActive;
+    server.lastStateActive=false;
+        if (server.secondLastStateActive
+        &&!server.lastStateActive){
+        server.replenishmentAmount= 1-server.capacity;
+        }
+    }
+    else{
+        task.remaining_time--;
+        current_time++;
+        server.capacity--;
+        server.secondLastStateActive = server.lastStateActive;
+        server.lastStateActive=true;
+        if (!server.secondLastStateActive
+        &&server.lastStateActive){
+            server.replenishmentTime = current_time+server.period;
+        }
+    }
+}
+\end{lstlisting}
+All of this is put set in motion with the $main$ function as shown below. Four tasks are declared, two of them are periodic and two of them are aperiodic. Similar to the example given at Fig.\ref{fig:high priority ss graph} The arrival time is also set to 1 and 8 for task 0 and task 3 respectively. The SS is also defined with capacity 1 and period of 5. The total run time of the queue is set to 20 units of time but this can be set to any number needed. The output of the code can be seen in Fig.\ref{fig:code_output} which exactly matches the example given at Fig.\ref{fig:high priority ss graph}
+
+\begin{lstlisting}[language=C++]
+int main() {
+    std::vector<Task> tasks = {
+        Task(0, 1, 5,1,false), // Aperiodic Task 0 with execution time 1 and period 5
+        Task(1, 2, 10,0,true), // periodic Task 1 with execution time 2 and period 10
+        Task(2, 6, 14,0,true),  // periodic Task 2 with execution time 3 and period 14
+        Task(3, 1, 5,8,false)   // Aperiodic Task 3 with execution time 1 and period 5
+    };
+    std::vector<Task> tasks_temp;
+    SporadicServer server = SporadicServer(1,5);
+    // Total time to run the scheduler
+    int total_time = 20;
+    schedule_tasks(tasks, total_time,tasks_temp,server);
+    return 0;
+}
+\end{lstlisting}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.2]{code_output.png}
+    \caption{Code implementation output}
+    \label{fig:code_output}
+\end{figure}
+
+\section{Conclusion}
+Sporadic Server algorithm has proven itself a solid solution for scheduling in real time operating systems since its introduction in the 80s of the last century. It offers an elegant way to try to handle aperiodic tasks in a simple way specially for sporadic aperiodic tasks.The algorithm however can be demanding in the aspect of overhead if non-sporadic aperiodic requests are needed to be handled where this would introduce complexity in accepting or rejecting the request depending on its schedulability. The Sporadic Server algorithm can also lead to under-utilization of system resources if a too-high of a capacity is given where this would affect the utilization of the periodic tasks to be scheduled. Priority selection can also be tricky in the system design where selecting the right priority for the SS is crucial to optimize performance of the system. On the other hand however, if these challenges are overcame, SS offers a good solution that can also be scaled up depending on the need. Multiple sporadic servers\cite{multiple-sporadic-servers} can be implemented to handle different types of aperiodic tasks to achieve better performance.
 \bibliographystyle{unsrt} 
 \bibliography{refs}
 
